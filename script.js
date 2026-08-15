@@ -4,10 +4,17 @@ async function loadImages(){
   // avoid cached responses when developing — add cache-busting and no-store
   const resp = await fetch('images.json?v=' + Date.now(), { cache: 'no-store' });
   const images = await resp.json();
-  // sort descending by filename (numeric-aware, case-insensitive)
-  images.sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' }));
 
-  for(const src of images){
+  // support both legacy array-of-strings and new array-of-objects {thumb, full}
+  const normalized = images.map(it => {
+    if (typeof it === 'string') return { thumb: it, full: it };
+    return { thumb: it.thumb || it.full, full: it.full || it.thumb };
+  });
+
+  // sort descending by filename (numeric-aware)
+  normalized.sort((a, b) => b.full.localeCompare(a.full, undefined, { numeric: true, sensitivity: 'base' }));
+
+  for(const entry of normalized){
     const item = document.createElement('div');
     item.className = 'item';
     // random size
@@ -18,14 +25,15 @@ async function loadImages(){
     else item.classList.add('size-small');
 
     const img = document.createElement('img');
-    img.src = src;
+    img.src = entry.thumb; // use thumbnail for grid
     img.loading = 'lazy';
     img.alt = '';
     img.decoding = 'async';
+    img.dataset.full = entry.full; // full-size path for the viewer
 
     // open in full viewer on click
     img.addEventListener('click', ()=>{
-      openViewer(src);
+      openViewer(img.dataset.full || img.src);
     });
 
     item.appendChild(img);
