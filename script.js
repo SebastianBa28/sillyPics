@@ -5,10 +5,10 @@ async function loadImages(){
   const resp = await fetch('images.json?v=' + Date.now(), { cache: 'no-store' });
   const images = await resp.json();
 
-  // support both legacy array-of-strings and object entries; use full images directly
+  // support both legacy array-of-strings and object entries { medium, full }
   const normalized = images.map(it => {
-    if (typeof it === 'string') return { full: it };
-    return { full: it.full || it.thumb || it };
+    if (typeof it === 'string') return { medium: it, full: it };
+    return { medium: it.medium || it.thumb || it.full, full: it.full || it.medium || it };
   });
 
   // sort descending by filename (numeric-aware)
@@ -24,8 +24,16 @@ async function loadImages(){
     else if(r>0.45) item.classList.add('size-medium');
     else item.classList.add('size-small');
 
+    const picture = document.createElement('picture');
+    // prefer WebP when available by using same basename with .webp
+    const medium = entry.medium || entry.full;
+    const webp = medium.replace(/\.[a-zA-Z0-9]+$/, '.webp');
+    const source = document.createElement('source');
+    source.type = 'image/webp';
+    source.srcset = webp;
+
     const img = document.createElement('img');
-    img.src = entry.full; // use full image for grid (thumbnails removed)
+    img.src = medium; // fallback for browsers without webp
     img.loading = 'lazy';
     img.alt = '';
     img.decoding = 'async';
@@ -36,7 +44,9 @@ async function loadImages(){
       openViewer(img.dataset.full || img.src);
     });
 
-    item.appendChild(img);
+    picture.appendChild(source);
+    picture.appendChild(img);
+    item.appendChild(picture);
     collage.appendChild(item);
   }
 }

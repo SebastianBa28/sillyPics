@@ -8,5 +8,14 @@ Serve locally for testing:
 python3 -m http.server 8000
 ```
 
-This project now uses the original `pics/` images directly (thumbnails removed). If load performance is a concern, consider creating optimized medium-sized images or hosting originals on a CDN before deploying.
+This project now supports medium-sized images stored in `medium/` to improve load performance without altering originals.
+
+To generate medium images locally (Pillow required):
+
+```bash
+pip install pillow
+python3 generate_medium.py
+```
+
+The script writes `medium/` and updates `images.json` to map `medium/*` to `pics/*`.
 
