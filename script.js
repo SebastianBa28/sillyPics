@@ -5,10 +5,10 @@ async function loadImages(){
   const resp = await fetch('images.json?v=' + Date.now(), { cache: 'no-store' });
   const images = await resp.json();
 
-  // support both legacy array-of-strings and new array-of-objects {thumb, full}
+  // support both legacy array-of-strings and object entries; use full images directly
   const normalized = images.map(it => {
-    if (typeof it === 'string') return { thumb: it, full: it };
-    return { thumb: it.thumb || it.full, full: it.full || it.thumb };
+    if (typeof it === 'string') return { full: it };
+    return { full: it.full || it.thumb || it };
   });
 
   // sort descending by filename (numeric-aware)
@@ -25,7 +25,7 @@ async function loadImages(){
     else item.classList.add('size-small');
 
     const img = document.createElement('img');
-    img.src = entry.thumb; // use thumbnail for grid
+    img.src = entry.full; // use full image for grid (thumbnails removed)
     img.loading = 'lazy';
     img.alt = '';
     img.decoding = 'async';
