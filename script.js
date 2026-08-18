@@ -69,7 +69,7 @@ async function loadImages(){
         }
       }
     });
-  }, { rootMargin: '100px' }); // Start loading 100px before image enters viewport
+  }, { rootMargin: '200px' }); // Start loading 200px before image enters viewport
 
   placeholders.forEach(p => observer.observe(p.item));
 }
