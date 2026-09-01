@@ -17,8 +17,9 @@ header p{margin:8px 0 0;color:#fff;font-size:1.5rem}
 .size-large{grid-row:span 44}
 .size-tall{grid-row:span 60}
 
-/* small screens tweak */
-@media (max-width:600px){.collage{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}}
+/* small screens tweak: narrower columns need a shorter row unit too,
+   otherwise the fixed-pixel size-* spans crop into tall slim strips */
+@media (max-width:600px){.collage{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));grid-auto-rows:6px}}
 
 /* light hover effect */
 .item:focus-within, .item:hover{transform:translateY(-4px);transition:transform .18s ease;box-shadow:0 10px 30px rgba(0,0,0,.6)}
